@@ -19,12 +19,14 @@ const (
 
 // CallMethod calls the registered hooks
 func (s *Session) CallMethod(method string, value interface{}) {
+	//检查 Model 上是否有对应钩子函数
 	fm := reflect.ValueOf(s.RefTable().Model).MethodByName(method)
 	if value != nil {
 		fm = reflect.ValueOf(value).MethodByName(method)
 	}
-	param := []reflect.Value{reflect.ValueOf(s)}
 	if fm.IsValid() {
+		//调用钩子函数, 每个钩子函数的参数类型为 *Session
+		param := []reflect.Value{reflect.ValueOf(s)}
 		if v := fm.Call(param); len(v) > 0 {
 			if err, ok := v[0].Interface().(error); ok {
 				log.Error(err)

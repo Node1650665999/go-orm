@@ -1,6 +1,6 @@
-# go-rpc
+# go-orm
 
-go-rpc 是在阅读 [gee-orm](https://github.com/geektutu/7days-golang/tree/master/gee-orm) 源码时的一些注解。
+go-orm 是在阅读 [gee-orm](https://github.com/geektutu/7days-golang/tree/master/gee-orm) 源码时的一些注解。
 
 orm 框架由如下几部分构成，分别为 :
 - 消息编解码

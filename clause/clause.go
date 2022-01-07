@@ -26,7 +26,7 @@ const (
 	COUNT
 )
 
-// Set adds a sub clause of specific type
+// Set 根据 Type 调用对应的 generator，生成该子句对应的 SQL 语句
 func (c *Clause) Set(name Type, vars ...interface{}) {
 	if c.sql == nil {
 		c.sql = make(map[Type]string)
@@ -37,7 +37,7 @@ func (c *Clause) Set(name Type, vars ...interface{}) {
 	c.sqlVars[name] = vars
 }
 
-// Build generate the final SQL and SQLVars
+// Build 根据传入的 Type 的顺序，构造出最终的 SQL 语句
 func (c *Clause) Build(orders ...Type) (string, []interface{}) {
 	var sqls []string
 	var vars []interface{}

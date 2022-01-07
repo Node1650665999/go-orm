@@ -1,5 +1,7 @@
 package schema
 
+//scheme 实现go结构体与数据表的映射，包含：表名映射，字段和字段类型映射以及字段约束(主键,非空)等
+
 import (
 	"geeorm/dialect"
 	"go/ast"
@@ -32,8 +34,11 @@ func (schema *Schema) RecordValues(dest interface{}) []interface{} {
 	destValue := reflect.Indirect(reflect.ValueOf(dest))
 	var fieldValues []interface{}
 	for _, field := range schema.Fields {
+		//通过反射获取 dest 内部字段的值，并写入 fieldValues
 		fieldValues = append(fieldValues, destValue.FieldByName(field.Name).Interface())
 	}
+
+	//fieldValues 数据格式为：[Tom 18]
 	return fieldValues
 }
 

@@ -1,5 +1,7 @@
 package geeorm
 
+//Engine 是 GeeORM 与用户交互的入口
+
 import (
 	"database/sql"
 	"fmt"
@@ -77,7 +79,7 @@ func (engine *Engine) Transaction(f TxFunc) (result interface{}, err error) {
 	return f(s)
 }
 
-// difference returns a - b
+// difference 获取 a 和 b 的差集
 func difference(a []string, b []string) (diff []string) {
 	mapB := make(map[string]bool)
 	for _, v := range b {
@@ -94,19 +96,21 @@ func difference(a []string, b []string) (diff []string) {
 // Migrate table
 func (engine *Engine) Migrate(value interface{}) error {
 	_, err := engine.Transaction(func(s *session.Session) (result interface{}, err error) {
+		//没有数据表，则直接创建
 		if !s.Model(value).HasTable() {
 			log.Infof("table %s doesn't exist", s.RefTable().Name)
 			return nil, s.CreateTable()
 		}
 		table := s.RefTable()
 		rows, _ := s.Raw(fmt.Sprintf("SELECT * FROM %s LIMIT 1", table.Name)).QueryRows()
-		columns, _ := rows.Columns()
+		columns, _ := rows.Columns()    //数据表中的所有字段
 		addCols := difference(table.FieldNames, columns)
 		delCols := difference(columns, table.FieldNames)
 		log.Infof("added cols %v, deleted cols %v", addCols, delCols)
 
 		for _, col := range addCols {
 			f := table.GetField(col)
+			//新增字段,这里其实少了一个参数 f.Tag, 即字段约束
 			sqlStr := fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s;", table.Name, f.Name, f.Type)
 			if _, err = s.Raw(sqlStr).Exec(); err != nil {
 				return
@@ -116,6 +120,12 @@ func (engine *Engine) Migrate(value interface{}) error {
 		if len(delCols) == 0 {
 			return
 		}
+		/*
+		删除字段并不像新增字段那么容易，一个比较可行的方法需要执行下列几个步骤:
+			第一步：从 old_table 中挑选需要保留的字段到 new_table 中。
+			第二步：删除 old_table。
+			第三步：重命名 new_table 为 old_table。
+		*/
 		tmp := "tmp_" + table.Name
 		fieldStr := strings.Join(table.FieldNames, ", ")
 		s.Raw(fmt.Sprintf("CREATE TABLE %s AS SELECT %s from %s;", tmp, fieldStr, table.Name))

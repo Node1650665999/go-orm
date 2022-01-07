@@ -1,5 +1,7 @@
 package clause
 
+//generator 实现了各个sql子句的生成
+
 import (
 	"fmt"
 	"strings"
@@ -37,12 +39,14 @@ func _insert(values ...interface{}) (string, []interface{}) {
 	return fmt.Sprintf("INSERT INTO %s (%v)", tableName, fields), []interface{}{}
 }
 
+//values 格式为： [[Tom 18] [Sam 25]]
 func _values(values ...interface{}) (string, []interface{}) {
 	// VALUES ($v1), ($v2), ...
 	var bindStr string
 	var sql strings.Builder
 	var vars []interface{}
 	sql.WriteString("VALUES ")
+	//values 是一个二位数组 values = [][]interface{}
 	for i, value := range values {
 		v := value.([]interface{})
 		if bindStr == "" {
@@ -54,6 +58,8 @@ func _values(values ...interface{}) (string, []interface{}) {
 		}
 		vars = append(vars, v...)
 	}
+
+	//最终处理成的格式：  sql: INSERT INTO User (Name,Age) VALUES (?, ?), (?, ?)  vars: [Tom 18 Sam 25]
 	return sql.String(), vars
 
 }
@@ -73,6 +79,7 @@ func _limit(values ...interface{}) (string, []interface{}) {
 func _where(values ...interface{}) (string, []interface{}) {
 	// WHERE $desc
 	desc, vars := values[0], values[1:]
+	//desc类似这种 : "name=?,age=?,phone=?"   vars : "tom", 18, "1111111"
 	return fmt.Sprintf("WHERE %s", desc), vars
 }
 
@@ -89,6 +96,8 @@ func _update(values ...interface{}) (string, []interface{}) {
 		keys = append(keys, k+" = ?")
 		vars = append(vars, v)
 	}
+
+	//最终处理成的格式类似这种： sql:update user set name=?, age=? vars:["Tom",18]
 	return fmt.Sprintf("UPDATE %s SET %s", tableName, strings.Join(keys, ", ")), vars
 }
 

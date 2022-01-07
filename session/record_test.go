@@ -1,6 +1,9 @@
 package session
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 var (
 	user1 = &User{"Tom", 18}
@@ -43,6 +46,7 @@ func TestSession_First(t *testing.T) {
 	if err != nil || u.Name != "Tom" || u.Age != 18 {
 		t.Fatal("failed to query first")
 	}
+	fmt.Printf("user : %+v", u)
 }
 
 func TestSession_Limit(t *testing.T) {

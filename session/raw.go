@@ -1,5 +1,7 @@
 package session
 
+//当前文件处理原生sql相关的操作
+
 import (
 	"database/sql"
 	"geeorm/clause"
@@ -46,7 +48,8 @@ type CommonDB interface {
 var _ CommonDB = (*sql.DB)(nil)
 var _ CommonDB = (*sql.Tx)(nil)
 
-// DB returns tx if a tx begins. otherwise return *sql.DB
+// DB 如果要支持事务，需要更改为 sql.Tx 执行,当 tx 不为空时，则使用 tx 执行 SQL 语句，
+// 否则使用 db 执行 SQL 语句。这样既兼容了原有的执行方式，又提供了对事务的支持。
 func (s *Session) DB() CommonDB {
 	if s.tx != nil {
 		return s.tx
