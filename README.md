@@ -86,12 +86,14 @@ Engine 首先通过 NewEngine() 来实例化，通过传入具体的数据库驱
 答案就在 Dialect 和 Schema 中，前者处理go类型和数据库类型的转换关系，后者处理结构体和数据表字段的转换关系。
 
 **Dialect**
+
 ![](svg/dialect.svg)
 
 **Schema**
+
 ![](svg/schema.svg)
 
 # Clause
-Clause 处理实现了各个 sql 子句 ，Clause 翻译为`方言`, 这个命名可以是取的非常恰当，因为不同的数据库其底层的`sql语句`都不一样，都有着自己的`方言`。
+Clause 实现了各个 sql 子句 ，Clause 翻译为`方言`, 这个命名可以是取的非常形象，因为不同的数据库其底层的 `sql语句` 都不一样，都有着自己的`方言`。
 ![](svg/clause.svg)
 
